@@ -1,44 +1,82 @@
-# ⊞ Micro-frontend Integration Guide
+# ⊞ How to Embed the Assessment Service
 
-The Assessment Service frontend is built using Next.js. For organizations seeking to embed this service within a larger monolithic portal (e.g., an LMS or HR system), there are several robust integration pathways.
+Want to show your assessments inside your own website, Learning Management System (LMS), or app? You're in the right place! 
 
-## ⚙ Iframe Embedding (Primary Method)
+This guide explains the easiest ways to seamlessly blend the Assessment Service right into your own platform so your users never feel like they left your website.
 
-The simplest and most secure integration method involves embedding the participant-facing assessment URLs via `<iframe>`.
+---
 
-### ✦ Security & CORS
-To protect against clickjacking while allowing authorized embedding, the system dynamically configures the `Content-Security-Policy` and `X-Frame-Options` headers.
-* **Tenant Configuration**: The tenant must add their parent domain (e.g., `https://lms.organization.com`) to their `allowedOrigins` array in the Assessment Service workspace.
-* **Middleware Execution**: The Next.js middleware and NestJS backend read this configuration and dynamically append the `frame-ancestors` directive for that specific session.
+## 💡 Method 1: The Easy Way (iFrames)
 
-### ✦ EmbedDetector & Dynamic CSS
-The frontend employs an `EmbedDetector` hook that analyzes `window.top !== window.self` and URL query parameters (`?embed=true`).
-When embedded:
-1. The global UI shells (like `WorkspaceShell` and `PageHeaderCard`) are automatically hidden.
-2. Background colors become transparent, allowing the iframe to seamlessly blend into the parent application's DOM.
-3. The dark mode theme is synchronized dynamically via `postMessage`.
+The absolute easiest and most common way to embed an assessment is by using a simple HTML `<iframe>`. 
 
-### ✦ Cross-Window Communication
-We use `window.postMessage()` to establish a two-way communication channel between the iframe and the parent window.
+When you use an iframe, our system is smart enough to detect it! It will automatically hide our top navigation bars and make our background transparent so that the assessment blends perfectly into your website's design.
 
-**Events emitted by the Iframe:**
-* `ASSESSMENT_LOADED`: Fired when the React tree successfully mounts.
-* `ASSESSMENT_COMPLETED`: Fired when the participant submits the final question. Includes a payload with the `sessionId` and preliminary `score`.
+### How to do it in 2 easy steps:
 
-**Events accepted by the Iframe:**
-* `THEME_UPDATE`: The parent window can push `{ theme: 'dark' }` into the iframe to force the assessment to match the parent's dark mode toggle instantly without reloading.
+**Step 1: Whitelist your website**
+To keep your data safe, we block random websites from embedding your assessments. 
+* Go to your Workspace Settings.
+* Find the `Allowed Origins` setting.
+* Type in your website's URL (for example: `https://my-awesome-lms.com`).
 
-## ⚙ Integration Modal
+**Step 2: Copy and paste the code**
+Go to any Assessment and click the **"Integrate"** button. A modal will pop up giving you the exact code to copy. It looks something like this:
 
-The frontend provides a built-in `IntegrationModal` for workspace administrators. This modal auto-generates the exact HTML and React code snippets required for embedding, dynamically injecting the current assessment's ID, the tenant's API keys, and the correct environmental URLs.
+```html
+<iframe 
+  src="https://assessment-service.molika.app/assessments/12345?embed=true" 
+  width="100%" 
+  height="600px" 
+  frameborder="0">
+</iframe>
+```
 
-## ⚙ Deep Linking & SSO
+### Talking to the iFrame (Advanced but easy!)
+Your website can actually "talk" to the assessment! We use a standard browser feature called `window.postMessage`.
 
-To integrate the admin workspace natively without iframes:
-1. Configure an external Identity Provider (IdP).
-2. Generate JWTs at the parent application level matching our expected payload structure.
-3. Pass the JWT seamlessly via URL parameters, or use a shared domain cookie if the parent and the Assessment Service operate on the same root domain (e.g., `app.domain.com` and `assessments.domain.com`).
+* **Knowing when they finish:** When a user completes the test, the iframe will shout out `ASSESSMENT_COMPLETED` to your website, along with their score. You can listen for this to unlock the next lesson in your LMS!
+* **Dark Mode Sync:** If your website has a Dark Mode toggle, you can tell the iframe to switch to dark mode by sending it a `THEME_UPDATE` message. It will change colors instantly!
 
-## ⚙ Module Federation (Advanced)
+---
 
-Next.js supports Webpack Module Federation (`@module-federation/nextjs-mf`). This allows you to expose specific React components (like the `ResultSheetDetailView` or the `RealtimeLeaderboard`) to be dynamically loaded into remote Next.js or React applications. This bypasses iframe boundaries entirely, sharing the React context tree, though it requires tightly coupled build pipelines.
+## 💡 Method 2: The Native Way (Next.js Multi Zones)
+
+If you are building your own website using **Next.js**, you can use a cool feature called **Multi Zones**. This makes the Assessment Service feel like it is literally part of your own codebase.
+
+Instead of an iframe, you tell your website to secretly fetch the Assessment Service whenever someone goes to a specific URL.
+
+### Why is this awesome?
+* No more iframe borders or weird scrolling issues.
+* The URL looks like it's yours! (e.g. `https://your-website.com/assessments/123`).
+* It shares your cookies perfectly, so users stay logged in without any hiccups.
+
+### How to do it:
+In your main website's `next.config.js` file, you just add a "rewrite" rule. 
+
+```javascript
+module.exports = {
+  async rewrites() {
+    return [
+      {
+        // When a user goes to your website's /assessments path...
+        source: '/assessments/:path*',
+        // ...secretly show them the Assessment Service!
+        destination: 'https://assessment-service.molika.app/assessments/:path*',
+      },
+    ]
+  },
+}
+```
+
+---
+
+## 💡 What about Admin Logins? (SSO)
+
+If you want your *teachers* or *admins* to log into your main website, and automatically be logged into the Assessment Service workspace without typing their password again, you can use **Single Sign-On (SSO)**.
+
+1. Your main website logs the user in.
+2. Your main website creates a secret JWT token for them.
+3. You pass that token to the Assessment Service in the background.
+
+*Tip: This works best if your main website and the Assessment Service share the same root domain (like `app.your-website.com` and `assessments.your-website.com`), because they can share the same login cookie!*

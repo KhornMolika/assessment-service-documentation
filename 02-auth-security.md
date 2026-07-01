@@ -33,15 +33,6 @@ Clients interacting with the workspace utilize a robust authentication mechanism
   }
   ```
 * **Token Storage**: `HttpOnly` secure cookies to prevent XSS-based token exfiltration.
-* **Payload Structure**:
-  ```json
-  {
-    "sub": "client_uuid",
-    "email": "workspace@organization.com",
-    "iat": 1717200000,
-    "exp": 1717286400
-  }
-  ```
 
 ### ✦ Participant Authentication
 Participants accessing assessments do not require full accounts. Instead, they operate via time-limited, signed URLs or session tokens.

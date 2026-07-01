@@ -48,7 +48,7 @@ flowchart TB
 * **Backend (NestJS 11)**: Manages business logic, real-time sessions, and asynchronous background tasks.
 * **Database (PostgreSQL 16)**: Primary persistent storage for clients, assessments, configurations, and result transcripts.
 * **Cache & Message Broker (Redis 7)**: Handles WebSocket state distribution across horizontally scaled backend nodes and manages background job queues (BullMQ).
-* **AI Evaluation Engine**: Interfaces with OpenAI to provide automated qualitative grading for subjective assessment types.
+* **AI Evaluation Engine**: Interfaces with DeepSeek to provide automated qualitative grading for subjective assessment types.
 
 ## ⛨ Entity Relationship Diagram (ERD)
 

@@ -14,7 +14,7 @@ Both the frontend and backend require properly configured `.env` files containin
 * `DATABASE_URL`: The PostgreSQL connection string.
 * `REDIS_URL`: The Redis connection string.
 * `JWT_SECRET`: A highly secure, randomized cryptographic key.
-* `OPENAI_API_KEY`: Credentials for the AI Grading Provider.
+* `DEEPSEEK_API_KEY`: Credentials for the AI Grading Provider.
 
 ## ✦ Deployment Strategies
 

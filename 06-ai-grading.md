@@ -4,7 +4,7 @@ The Assessment Service employs Large Language Models (LLMs) to automate the eval
 
 ## ⚙ Integration Architecture
 
-The system utilizes an abstraction layer over the OpenAI API, allowing for future expansion to other providers (e.g., Anthropic, Gemini).
+The system utilizes an abstraction layer over the DeepSeek API, allowing for future expansion to other providers (e.g., Anthropic, Gemini).
 
 ```mermaid
 %%{init: { 'theme': 'base', 'themeVariables': { 'textColor': '#0ea5e9', 'messageTextColor': '#0ea5e9', 'actorTextColor': '#0ea5e9', 'noteTextColor': '#0f172a', 'lineColor': '#38bdf8' } } }%%
@@ -13,7 +13,7 @@ sequenceDiagram
     actor Admin
     participant Frontend as Next.js Client
     participant Backend as NestJS API & BullMQ
-    participant LLM as OpenAI GPT-4 API
+    participant LLM as DeepSeek API
     
     Backend->>LLM: Submit Prompt (Question Context + Rubric + Participant Answer)
     activate LLM
