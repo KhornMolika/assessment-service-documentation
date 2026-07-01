@@ -57,52 +57,55 @@ The core relational data model is designed to support multi-tenancy and complex 
 ```mermaid
 %%{init: { 'theme': 'base', 'themeVariables': { 'textColor': '#0ea5e9', 'lineColor': '#38bdf8', 'primaryTextColor': '#0ea5e9' } } }%%
 erDiagram
-    Client {
-        uuid id PK
-        string name
-        string brandingColor
-        timestamp createdAt
-    }
-    
-    Participant {
-        uuid id PK
-        uuid clientId FK
-        string name
-        string identifier
-    }
+    CLIENT ||--o{ TOPIC : owns
+    TOPIC ||--o{ QUESTION : contains
+    TOPIC ||--o{ QUESTION_BANK : contains
+    TOPIC ||--o{ ASSESSMENT : contains
 
-    Assessment {
-        uuid id PK
-        uuid clientId FK
-        string title
-        string mode "SELF_PACED | REAL_TIME"
-        jsonb settings
-    }
+    QUESTION_BANK ||--o{ QUESTION_BANK_QUESTION : has
+    QUESTION ||--o{ QUESTION_BANK_QUESTION : "linked via"
 
-    QuestionBank {
-        uuid id PK
-        uuid clientId FK
-        string title
-    }
+    ASSESSMENT ||--|| ASSESSMENT_SETTING : "configured by"
+    ASSESSMENT ||--o{ ASSESSMENT_QUESTION : includes
+    QUESTION ||--o{ ASSESSMENT_QUESTION : "snapshotted in"
+    ASSESSMENT ||--o{ ASSESSMENT_PARTICIPANT : assigns
+    PARTICIPANT ||--o{ ASSESSMENT_PARTICIPANT : "enrolled via"
 
-    AnswerSheet {
+    ASSESSMENT ||--o{ ANSWER_SHEET : "sessions for"
+    ASSESSMENT_PARTICIPANT ||--o{ ANSWER_SHEET : starts
+    ANSWER_SHEET ||--o{ ANSWER_ENTRY : records
+    ASSESSMENT_QUESTION ||--o{ ANSWER_ENTRY : "answered by"
+    ANSWER_ENTRY ||--o{ AI_GRADING_JOB : "graded by"
+
+    ASSESSMENT_QUESTION {
         uuid id PK
         uuid assessmentId FK
-        uuid participantId FK
-        float totalScore
-        string status
+        uuid questionId FK
+        int order
+        decimal points
+        enum questionType
+        jsonb questionSnapshot
     }
 
-    Client ||--o{ QuestionBank : owns
-    Client ||--o{ Assessment : manages
-    Client ||--o{ Participant : invites
+    ANSWER_SHEET {
+        uuid id PK
+        uuid assessmentId FK
+        enum status
+        decimal totalScore
+        string grade
+        boolean isPassed
+        timestamp startedAt
+        timestamp submittedAt
+    }
 
-    Assessment ||--o{ QuestionBank : includes
-    Assessment ||--o{ AnswerSheet : generates
-    Participant ||--o{ AnswerSheet : attempts
-    QuestionBank ||--o{ QuestionRound : contains
-    AnswerSheet ||--o{ AnswerEntry : tracks
-    QuestionRound ||--o{ AnswerEntry : evaluated-by
+    ANSWER_ENTRY {
+        uuid id PK
+        uuid answerSheetId FK
+        uuid assessmentQuestionId FK
+        jsonb response
+        decimal scoreAwarded
+        enum gradingStatus
+    }
 ```
 
 ### ✦ Data Dictionary Highlights
