@@ -4,8 +4,8 @@ Security is integrated at multiple layers of the application, ensuring that tena
 
 ## ⚙ Authentication Mechanisms
 
-### ✦ Client Authentication (Admin Panel)
-Administrators interacting with the workspace utilize a robust authentication mechanism.
+### ✦ Client Authentication (Workspace)
+Clients interacting with the workspace utilize a robust authentication mechanism.
 
 * **Strategy**: JWT-based stateless authentication.
 * **Token Storage**: `HttpOnly` secure cookies to prevent XSS-based token exfiltration.
@@ -13,8 +13,7 @@ Administrators interacting with the workspace utilize a robust authentication me
   ```json
   {
     "sub": "client_uuid",
-    "email": "admin@organization.com",
-    "role": "ADMIN",
+    "email": "workspace@organization.com",
     "iat": 1717200000,
     "exp": 1717286400
   }
