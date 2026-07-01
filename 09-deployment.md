@@ -33,3 +33,13 @@ The repository supports automated workflows for:
 * **Linting & Formatting**: Enforcing ESLint and Prettier rules.
 * **Type Checking**: Running `tsc --noEmit` across both codebases.
 * **Testing**: Executing Jest unit and E2E tests before container builds.
+
+## ✦ Security Hardening in Production
+* **CORS**: Ensure `NESTJS_CORS_ORIGIN` is strictly bound to the frontend domain.
+* **Helmet**: NestJS Helmet middleware is enabled to enforce strict HSTS and X-Frame-Options policies.
+* **WAF**: Put a Web Application Firewall in front of the Load Balancer to absorb Layer 7 DDoS attacks, specifically protecting the `/api/v1/auth/token` endpoints.
+
+## ✦ Database Migrations
+We utilize TypeORM migrations. 
+* During CI/CD pipelines, run `npm run typeorm migration:run` before traffic shifts to the new containers.
+* Never use `synchronize: true` in production environments as it can cause catastrophic schema alterations and data loss.

@@ -25,3 +25,12 @@ A synchronous environment where an instructor controls the pacing.
 | `gradeLabels` | Array | Custom grading bands (e.g., A, B, C) mapped to score percentages. |
 | `shuffleQuestions` | Boolean | Randomizes the order of question delivery per participant. |
 | `shuffleOptions` | Boolean | Randomizes the order of multiple-choice options. |
+
+## ✦ Execution Lifecycle & State Machine
+The `Assessment` entity tracks states: `DRAFT` -> `PUBLISHED` -> `ARCHIVED`.
+Only `DRAFT` assessments can have their `AssessmentQuestion` relationships modified. Once published, the question set becomes immutable to ensure all participants are graded against the exact same snapshot, even if the underlying `QuestionBank` is modified later.
+
+## ✦ Real-Time Sync Mechanisms (Instructor-Led)
+For Real-Time assessments, the backend utilizes `Socket.io`. 
+* **State Propagation**: The Redis adapter ensures that if the Host is connected to Node A and Participant 1 is connected to Node B, the `ADVANCE_SLIDE` event emitted by the Host propagates across the pub/sub cluster.
+* **Late Joiners**: The current active question index and leaderboard state are cached in Redis under the `sessionId`. When a participant joins late, they immediately receive the latest cached state to sync their UI instantly.
