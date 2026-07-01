@@ -26,7 +26,7 @@ flowchart TB
     subgraph Data & Services Tier
         DB[(PostgreSQL 16)]
         Cache[(Redis 7)]
-        LLM{OpenAI GPT-4}
+        LLM{DeepSeek API}
     end
 
     Browser -- "HTTPS (REST)" --> Client
