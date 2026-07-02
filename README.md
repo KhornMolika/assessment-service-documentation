@@ -13,4 +13,3 @@ Welcome to the Assessment Service technical documentation. This repository conta
 * **[07. Multi-tenancy & Client Isolation](./07-multi-tenancy.md)** — Data separation and multi-tenant architecture.
 * **[08. Micro-frontend Integration](./08-micro-frontend.md)** — Guidelines for embedding the assessment service within broader applications.
 * **[09. Deployment & Infrastructure](./09-deployment.md)** — Infrastructure requirements, CI/CD, and scaling strategies.
-* **[10. Known Limitations & Technical Debt](./10-limitations-tech-debt.md)** — Current constraints and future roadmap considerations.

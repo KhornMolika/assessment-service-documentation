@@ -12,7 +12,7 @@ The absolute easiest and most common way to embed an assessment is by using a si
 
 When you use an iframe, our system is smart enough to detect it! It will automatically hide our top navigation bars and make our background transparent so that the assessment blends perfectly into your website's design.
 
-### How to do it in 2 easy steps:
+### How to do it securely in 3 easy steps:
 
 **Step 1: Whitelist your website**
 To keep your data safe, we block random websites from embedding your assessments. 
@@ -20,12 +20,25 @@ To keep your data safe, we block random websites from embedding your assessments
 * Find the `Allowed Origins` setting.
 * Type in your website's URL (for example: `https://my-awesome-lms.com`).
 
-**Step 2: Copy and paste the code**
-Go to any Assessment and click the **"Integrate"** button. A modal will pop up giving you the exact code to copy. It looks something like this:
+**Step 2: Get an Embed Token (Securely)**
+For security, we now use a token-based approach. Your backend server should request a one-time token from our API using your Client ID and Secret. 
+
+Make a `POST` request to `https://api.molika.app/api/v1/auth/embed-token` from your backend:
+```json
+{
+  "clientId": "YOUR_CLIENT_ID",
+  "clientSecret": "YOUR_CLIENT_SECRET",
+  "origin": "https://your-website.com"
+}
+```
+This will return an `access_token` that you pass to your frontend.
+
+**Step 3: Render the iframe**
+Now that your frontend has the secure token, you can pass it to the iframe URL using the `?token=` parameter.
 
 ```html
 <iframe 
-  src="https://assessment-service.molika.app/assessments/12345?embed=true" 
+  src="https://assessment-service.molika.app/assessments/12345?token=YOUR_SECURE_TOKEN" 
   width="100%" 
   height="600px" 
   frameborder="0">
@@ -36,7 +49,18 @@ Go to any Assessment and click the **"Integrate"** button. A modal will pop up g
 Your website can actually "talk" to the assessment! We use a standard browser feature called `window.postMessage`.
 
 * **Knowing when they finish:** When a user completes the test, the iframe will shout out `ASSESSMENT_COMPLETED` to your website, along with their score. You can listen for this to unlock the next lesson in your LMS!
-* **Dark Mode Sync:** If your website has a Dark Mode toggle, you can tell the iframe to switch to dark mode by sending it a `THEME_UPDATE` message. It will change colors instantly!
+* **Theme & Customization Sync:** You can tell the iframe to switch themes or inject CSS by sending a `SYNC_THEME` message when the iframe sends `EMBED_READY`.
+```javascript
+// Example of passing theme colors to the iframe
+iframeRef.current.contentWindow.postMessage({
+  type: "SYNC_THEME",
+  mode: "light",
+  theme: {
+    "--primary": "210 100% 50%", // Use your own HSL primary color
+    "--radius": "0.5rem"
+  }
+}, "*");
+```
 
 ---
 
